@@ -1,0 +1,106 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AuditStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum UserRole {
+  ADMIN
+  CLIENT
+}
+
+model Client {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  websiteUrl   String
+  businessType String?
+  city         String?
+  state        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  audits       Audit[]
+  users        User[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(CLIENT)
+  clientId     String?
+  createdAt    DateTime @default(now())
+
+  client       Client?  @relation(fields: [clientId], references: [id])
+
+  @@index([clientId])
+}
+
+model Audit {
+  id           String      @id @default(cuid())
+  clientId     String
+  websiteUrl   String
+  status       AuditStatus @default(PENDING)
+  progress     Int         @default(0)
+  overallScore Int?
+  errorMessage String?
+  scheduledPeriod String?
+
+  createdAt    DateTime    @default(now())
+  startedAt    DateTime?
+  completedAt  DateTime?
+
+  client       Client      @relation(fields: [clientId], references: [id])
+  result       AuditResult?
+  report       Report?
+
+  @@index([clientId, createdAt])
+  @@unique([clientId, scheduledPeriod])
+}
+
+model AuditResult {
+  id             String   @id @default(cuid())
+  auditId        String   @unique
+  auditVersion   String   @default("v1.0")
+  overallScore   Int
+  scoreBreakdown Json
+  criticalIssues Json
+  importantIssues Json
+  quickWins      Json
+  recommendations Json
+  executiveSummary String
+
+  onPageData     Json?
+  technicalData  Json?
+  pageSpeedData  Json?
+  gscData        Json?
+  rankingData    Json?
+  schemaData     Json?
+
+  createdAt      DateTime @default(now())
+
+  audit          Audit    @relation(fields: [auditId], references: [id], onDelete: Cascade)
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  auditId     String   @unique
+  pdfPath     String
+  emailStatus String   @default("PENDING")
+  whatsappStatus String @default("PENDING")
+  createdAt   DateTime @default(now())
+
+  audit       Audit    @relation(fields: [auditId], references: [id], onDelete: Cascade)
+}
