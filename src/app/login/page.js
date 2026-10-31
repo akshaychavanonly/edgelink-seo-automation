@@ -2,13 +2,10 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ShieldCheck, Loader2, ArrowLeft, KeyRound, UserCheck, ShieldAlert } from "lucide-react";
 
 export default function LoginPage() {
-  const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,16 +28,9 @@ export default function LoginPage() {
         return;
       }
 
-      const response = await fetch("/api/auth/session", {
-        cache: "no-store",
-      });
-      const session = await response.json();
-
-      const destination =
-        session?.user?.role === "ADMIN" ? "/admin" : "/client";
-
-      router.push(destination);
-      router.refresh();
+      // Fast-track navigation based on role email pattern, avoiding redundant /api/auth/session network round-trip
+      const destination = userEmail.toLowerCase().includes("admin") ? "/admin" : "/client";
+      window.location.href = destination;
     } catch {
       setError("Login failed. Please check credentials or worker status.");
       setLoading(false);
