@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate --config prisma7.config.ts"
+    "postinstall": "prisma generate --config prisma7.config.ts",
+    "worker:render": "node src/workers/render.worker.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",
