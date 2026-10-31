@@ -51,6 +51,7 @@ model User {
 model Audit {
   id           String      @id @default(cuid())
   clientId     String
+  clientName   String      @default("")
   websiteUrl   String
   status       AuditStatus @default(PENDING)
   progress     Int         @default(0)

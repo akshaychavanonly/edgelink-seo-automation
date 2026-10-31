@@ -49,6 +49,7 @@ export async function POST(request) {
     const clients = await prisma.client.findMany({
       select: {
         id: true,
+        name: true,
         websiteUrl: true,
       },
     });
@@ -57,9 +58,13 @@ export async function POST(request) {
       let audit;
 
       try {
+        // Store clientName as an immutable snapshot at the time the
+        // scheduled audit is created, so renaming the client later
+        // does not retroactively change historical audit cards.
         audit = await prisma.audit.create({
           data: {
             clientId: client.id,
+            clientName: client.name,
             websiteUrl: client.websiteUrl,
             status: "PENDING",
             progress: 0,

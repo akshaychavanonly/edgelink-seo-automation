@@ -457,7 +457,7 @@ export default function AdminDashboard() {
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               <h4 className="text-sm font-bold text-white">
-                                {audit.client?.name || "Client"}
+                                {audit.clientName || audit.client?.name || "Client"}
                               </h4>
                               <span className="text-[11px] text-slate-500">•</span>
                               <span className="flex items-center gap-1 text-[11px] text-slate-400">

@@ -109,9 +109,12 @@ export async function POST(request) {
       },
     });
 
+    // Store clientName as an immutable snapshot so renaming the client
+    // later does not retroactively change historical audit cards.
     const audit = await prisma.audit.create({
       data: {
         clientId: client.id,
+        clientName: client.name,
         websiteUrl: input.websiteUrl,
         status: "PENDING",
         progress: 0,
